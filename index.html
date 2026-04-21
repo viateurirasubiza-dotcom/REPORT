@@ -1,11 +1,37 @@
-﻿ <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>STUDENTS REPORTS SYSTEM</title>
-
 <style>
-body{font-family:Arial;margin:0;padding:20px;background:#eef2f7;}
+/* General Reset & Fonts */
+body, html {margin:0;padding:0;font-family:Arial, sans-serif;height:100%;overflow-x:hidden;}
+canvas#particlesCanvas {position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background:#1f1f1f;}
+
+/* LOGIN CARD */
+#loginCard {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background: rgba(0,0,0,0.85);
+    padding:30px;
+    border-radius:15px;
+    text-align:center;
+    width:300px;
+    color:white;
+}
+#loginCard input {width:90%;margin:10px 0;padding:8px;border-radius:5px;border:none;}
+
+/* DASHBOARD */
+#dashboard {
+    display:none;
+    background:#eef2f7;
+    min-height:100vh;
+    padding:20px;
+}
+
+/* Existing styles for cards, table, buttons */
 .container{max-width:1100px;margin:auto;}
 .card{background:white;padding:20px;margin-bottom:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
 input,select{padding:8px;margin:5px;width:170px;}
@@ -25,80 +51,78 @@ th{background:#ddd;}
 .pagination button {padding: 5px 10px; margin: 0 5px; background-color: #1f3c88; color: white; border: none; cursor: pointer;}
 .pagination button:disabled {background-color: #ddd;}
 </style>
-
 </head>
-
 <body>
+
+<!-- PARTICLES BACKGROUND -->
+<canvas id="particlesCanvas"></canvas>
+
+<!-- LOGIN CARD -->
+<div id="loginCard">
+    <h2>STUDENTS REPORTS SYSTEM</h2>
+    <input id="loginUsername" placeholder="Username"><br>
+    <input id="loginPassword" type="password" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
 <div class="container">
 
-<!-- SAVE -->
+<!-- SAVE CARD -->
 <div class="card">
 <h2>STUDENTS REPORTS SYSTEM</h2>
-
 <input id="school" placeholder="School Name">
-
 <select id="cls">
 <option>P1</option><option>P2</option><option>P3</option>
 <option>P4</option><option>P5</option><option>P6</option>
 <option>S1</option><option>S2</option><option>S3</option>
 <option>S4</option><option>S5</option><option>S6</option>
 </select>
-
 <br>
-
 <input id="name" placeholder="Student Name">
 <input id="upi" placeholder="UPI">
-
 <br>
-
 <select id="gender">
     <option value="">Select Gender</option>
     <option value="M">Male</option>
     <option value="F">Female</option>
 </select>
-
 <br>
-
 <select id="term">
 <option>Term 1</option>
 <option>Term 2</option>
 <option>Term 3</option>
 </select>
-
 <br>
-
 <input id="kiny" type="number" placeholder="Kinyarwanda">
 <input id="eng" type="number" placeholder="English">
 <input id="math" type="number" placeholder="Math">
 <input id="french" type="number" placeholder="French">
 <input id="sst" type="number" placeholder="SST">
-
 <br>
-
 <button onclick="saveStudent()">SAVE STUDENT</button>
+<button onclick="logout()">Logout</button>
 </div>
 
-<!-- FILTER -->
+<!-- FILTER CARD -->
 <div class="card">
 <h3>VIEW REPORTS</h3>
-
 <select id="filterTerm">
 <option>Term 1</option>
 <option>Term 2</option>
 <option>Term 3</option>
 </select>
-
 <select id="filterClass">
 <option>P1</option><option>P2</option><option>P3</option>
 <option>P4</option><option>P5</option><option>P6</option>
 <option>S1</option><option>S2</option><option>S3</option>
 <option>S4</option><option>S5</option><option>S6</option>
 </select>
-
 <button onclick="filterStudents()">LOAD STUDENTS</button>
 </div>
 
-<!-- STUDENTS -->
+<!-- STUDENTS LIST -->
 <div class="card">
 <h3>STUDENTS</h3>
 <div id="studentsList"></div>
@@ -107,21 +131,18 @@ th{background:#ddd;}
 
 <!-- REPORT -->
 <div class="report" id="report">
-    <button onclick="hideReport()">Hide Report</button>
-
+<button onclick="hideReport()">Hide Report</button>
 <div class="center">
 <h2>REPUBLIC OF RWANDA</h2>
 <h3>MINISTRY OF EDUCATION</h3>
 <h3>CAMIS OFFICIAL SCHOOL REPORT CARD</h3>
 </div>
-
 <div class="info">
 <div class="box">
 <b>School Name:</b> <span id="r_school"></span><br>
 <b>Year:</b> 2026<br>
 <b>Term:</b> <span id="r_term"></span>
 </div>
-
 <div class="box">
 <b>Student Name:</b> <span id="r_name"></span><br>
 <b>UPI/UCI:</b> <span id="r_upi"></span><br>
@@ -131,35 +152,29 @@ th{background:#ddd;}
 </div>
 
 <div class="section">1. SUBJECT PERFORMANCE</div>
-
 <table>
-<tr>
-<th>Subject</th><th>Marks</th><th>Competence</th><th>Grade</th><th>Remark</th>
-</tr>
-
+<tr><th>Subject</th><th>Marks</th><th>Competence</th><th>Grade</th><th>Remark</th></tr>
 <tr><td>Kinyarwanda</td><td id="k1"></td><td id="c1"></td><td id="g1"></td><td id="r1"></td></tr>
 <tr><td>English</td><td id="k2"></td><td id="c2"></td><td id="g2"></td><td id="r2"></td></tr>
 <tr><td>Mathematics</td><td id="k3"></td><td id="c3"></td><td id="g3"></td><td id="r3"></td></tr>
 <tr><td>French</td><td id="k4"></td><td id="c4"></td><td id="g4"></td><td id="r4"></td></tr>
 <tr><td>Social Studies</td><td id="k5"></td><td id="c5"></td><td id="g5"></td><td id="r5"></td></tr>
-
 <tr><td><b>Total Marks</b></td><td id="totalMarks"></td><td colspan="3"></td></tr>
-
 </table>
 
 <div class="section">2. OVERALL PERFORMANCE SUMMARY</div>
 <table>
 <tr>
-    <th>Average</th>
-    <th>Aggregate Grade</th>
-    <th>Position</th>
-    <th>Total Students</th>
+<th>Average</th>
+<th>Aggregate Grade</th>
+<th>Position</th>
+<th>Total Students</th>
 </tr>
 <tr>
-    <td id="avg"></td>
-    <td id="agg"></td>
-    <td id="pos"></td>
-    <td id="totalStudents"></td>
+<td id="avg"></td>
+<td id="agg"></td>
+<td id="pos"></td>
+<td id="totalStudents"></td>
 </tr>
 </table>
 
@@ -174,268 +189,201 @@ th{background:#ddd;}
 <div class="line">Head Teacher</div>
 </div>
 
-<!-- Action Buttons -->
 <div class="action-buttons">
-    <button onclick="printReport()">📄 Print Report</button>
-    <button onclick="deleteStudent()">🗑 Delete Student</button>
-    <button onclick="editMarks()">✏ Edit Marks</button>
+<button onclick="printReport()">📄 Print Report</button>
+<button onclick="deleteStudent()">🗑 Delete Student</button>
+<button onclick="editMarks()">✏ Edit Marks</button>
+</div>
 </div>
 
-</div>
-
-</div>
+</div> <!-- container -->
+</div> <!-- dashboard -->
 
 <script>
-
-// Database (localStorage)
-let db = JSON.parse(localStorage.getItem("camis_db") || "{}");
-
-let currentUPI = null;
-let currentTerm = null;
-let currentPage = 1;
-const pageSize = 5;  // Number of students per page
-
-/* GRADING */
-function grade(s) {
-    return s >= 80 ? "A" : s >= 70 ? "B" : s >= 60 ? "C" : s >= 50 ? "D" : "F";
+// PARTICLES BACKGROUND
+const canvas = document.getElementById('particlesCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let particles = [];
+for (let i = 0; i < 100; i++) {
+    particles.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, radius: Math.random()*2+1, speed: Math.random()*1+0.5, color:`hsl(${Math.random()*360},70%,60%)`});
 }
-
-/* COMPETENCE */
-function competence(s) {
-    return s >= 70 ? "Achieved" : s >= 50 ? "Moderate" : "Basic";
-}
-
-/* REMARKS */
-function remark(s) {
-    return s >= 80 ? "Excellent" : s >= 70 ? "Very Good" : s >= 60 ? "Good" : s >= 50 ? "Fair" : "Needs Improvement";
-}
-
-/* SAVE STUDENT */
-function saveStudent() {
-
-    let school = document.getElementById("school").value;
-    let cls = document.getElementById("cls").value;
-    let name = document.getElementById("name").value;
-    let upi = document.getElementById("upi").value;
-    let gender = document.getElementById("gender").value;
-    let term = document.getElementById("term").value;
-
-    let k1 = +document.getElementById("kiny").value || 0;
-    let k2 = +document.getElementById("eng").value || 0;
-    let k3 = +document.getElementById("math").value || 0;
-    let k4 = +document.getElementById("french").value || 0;
-    let k5 = +document.getElementById("sst").value || 0;
-
-    if (!school || !name || !upi || !gender) {
-        alert("Please fill in the required fields!");
-        return;
-    }
-
-    let avg = (k1 + k2 + k3 + k4 + k5) / 5;
-
-    if (!db[upi]) {
-        db[upi] = { name, upi, school, className: cls, gender, terms: {} };
-    }
-
-    db[upi].terms[term] = { marks: { k1, k2, k3, k4, k5 }, avg };
-
-    localStorage.setItem("camis_db", JSON.stringify(db));
-
-    alert("Student data saved successfully.");
-    clearForm();
-}
-
-/* CLEAR FORM */
-function clearForm() {
-    document.getElementById("school").value = "";
-    document.getElementById("name").value = "";
-    document.getElementById("upi").value = "";
-    document.getElementById("gender").value = "";
-    document.getElementById("kiny").value = "";
-    document.getElementById("eng").value = "";
-    document.getElementById("math").value = "";
-    document.getElementById("french").value = "";
-    document.getElementById("sst").value = "";
-}
-
-/* FILTER STUDENTS */
-function filterStudents() {
-    let term = document.getElementById("filterTerm").value;
-    let cls = document.getElementById("filterClass").value;
-
-    let html = "";
-    let filteredStudents = [];
-
-    for (let upi in db) {
-        let s = db[upi];
-
-        if (s.className === cls && s.terms && s.terms[term]) {
-            filteredStudents.push(s);
-        }
-    }
-
-    let start = (currentPage - 1) * pageSize;
-    let end = start + pageSize;
-    let studentsToShow = filteredStudents.slice(start, end);
-
-    studentsToShow.forEach(s => {
-        html += `<button class="studentBtn" onclick="openStudent('${s.upi}','${term}')">${s.name}</button>`;
+function animateParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+        ctx.fillStyle=p.color;
+        ctx.fill();
+        p.y-=p.speed;
+        if(p.y<0) p.y=canvas.height;
     });
-
-    document.getElementById("studentsList").innerHTML = html;
-
-    createPagination(filteredStudents.length);
+    requestAnimationFrame(animateParticles);
 }
+animateParticles();
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight;});
 
-/* PAGINATION */
-function createPagination(totalStudents) {
-    let totalPages = Math.ceil(totalStudents / pageSize);
-    let paginationHtml = "";
-
-    for (let i = 1; i <= totalPages; i++) {
-        paginationHtml += `<button onclick="goToPage(${i})" ${i === currentPage ? 'disabled' : ''}>${i}</button>`;
+// LOGIN
+function login(){
+    const user=document.getElementById('loginUsername').value;
+    const pass=document.getElementById('loginPassword').value;
+    if(user==='admin' && pass==='admin'){
+        document.getElementById('loginCard').style.display='none';
+        document.getElementById('dashboard').style.display='block';
+        document.getElementById('loginUsername').value='';
+        document.getElementById('loginPassword').value='';
+    } else {
+        alert('Invalid username or password');
     }
-
-    document.getElementById("pagination").innerHTML = paginationHtml;
 }
 
-function goToPage(page) {
-    currentPage = page;
+// LOGOUT
+function logout(){
+    document.getElementById('dashboard').style.display='none';
+    document.getElementById('loginCard').style.display='block';
+}
+
+// STUDENTS DATA
+let students = [];
+let currentPage = 1;
+let itemsPerPage = 5;
+let filtered = [];
+let currentStudent = null;
+
+function saveStudent(){
+    const s = {
+        school: document.getElementById('school').value,
+        cls: document.getElementById('cls').value,
+        name: document.getElementById('name').value,
+        upi: document.getElementById('upi').value,
+        gender: document.getElementById('gender').value,
+        term: document.getElementById('term').value,
+        marks:[
+            Number(document.getElementById('kiny').value),
+            Number(document.getElementById('eng').value),
+            Number(document.getElementById('math').value),
+            Number(document.getElementById('french').value),
+            Number(document.getElementById('sst').value)
+        ]
+    };
+    if(currentStudent){
+        Object.assign(currentStudent,s);
+        currentStudent=null;
+    } else {students.push(s);}
+    alert('Student saved');
+    clearInputs();
     filterStudents();
 }
 
-/* OPEN STUDENT REPORT */
-function openStudent(upi, term) {
-    let s = db[upi];
-    if (!s || !s.terms || !s.terms[term]) {
-        alert("No data found for this student.");
-        return;
-    }
+function clearInputs(){
+    document.getElementById('school').value='';
+    document.getElementById('cls').value='P1';
+    document.getElementById('name').value='';
+    document.getElementById('upi').value='';
+    document.getElementById('gender').value='';
+    document.getElementById('term').value='Term 1';
+    document.getElementById('kiny').value='';
+    document.getElementById('eng').value='';
+    document.getElementById('math').value='';
+    document.getElementById('french').value='';
+    document.getElementById('sst').value='';
+}
 
-    let t = s.terms[term];
+function filterStudents(){
+    const term=document.getElementById('filterTerm').value;
+    const cls=document.getElementById('filterClass').value;
+    filtered=students.filter(s=>s.term===term && s.cls===cls);
+    currentPage=1;
+    showPage();
+}
 
-    currentUPI = upi;
-    currentTerm = term;
-
-    document.getElementById("report").style.display = "block";
-
-    document.getElementById("r_school").innerText = s.school;
-    document.getElementById("r_term").innerText = term;
-    document.getElementById("r_name").innerText = s.name;
-    document.getElementById("r_upi").innerText = s.upi;
-    document.getElementById("r_cls").innerText = s.className;
-    document.getElementById("r_gender").innerText = s.gender;
-
-    let marks = t.marks;
-    document.getElementById("k1").innerText = marks.k1;
-    document.getElementById("k2").innerText = marks.k2;
-    document.getElementById("k3").innerText = marks.k3;
-    document.getElementById("k4").innerText = marks.k4;
-    document.getElementById("k5").innerText = marks.k5;
-
-    document.getElementById("g1").innerText = grade(marks.k1);
-    document.getElementById("g2").innerText = grade(marks.k2);
-    document.getElementById("g3").innerText = grade(marks.k3);
-    document.getElementById("g4").innerText = grade(marks.k4);
-    document.getElementById("g5").innerText = grade(marks.k5);
-
-    document.getElementById("c1").innerText = competence(marks.k1);
-    document.getElementById("c2").innerText = competence(marks.k2);
-    document.getElementById("c3").innerText = competence(marks.k3);
-    document.getElementById("c4").innerText = competence(marks.k4);
-    document.getElementById("c5").innerText = competence(marks.k5);
-
-    document.getElementById("r1").innerText = remark(marks.k1);
-    document.getElementById("r2").innerText = remark(marks.k2);
-    document.getElementById("r3").innerText = remark(marks.k3);
-    document.getElementById("r4").innerText = remark(marks.k4);
-    document.getElementById("r5").innerText = remark(marks.k5);
-
-    // Total Marks Calculation
-    let totalMarks = marks.k1 + marks.k2 + marks.k3 + marks.k4 + marks.k5;
-    document.getElementById("totalMarks").innerText = totalMarks;
-
-    document.getElementById("avg").innerText = t.avg.toFixed(1);
-    document.getElementById("agg").innerText = grade(t.avg);
-
-    let allStudents = Object.values(db);
-    let rankedStudents = allStudents.sort((a, b) => {
-        let avgA = a.terms[term] ? a.terms[term].avg : 0;
-        let avgB = b.terms[term] ? b.terms[term].avg : 0;
-        return avgB - avgA; // Descending order
+function showPage(){
+    const list=document.getElementById('studentsList');
+    list.innerHTML='';
+    const start=(currentPage-1)*itemsPerPage;
+    const end=start+itemsPerPage;
+    filtered.slice(start,end).forEach((s,i)=>{
+        const btn=document.createElement('button');
+        btn.className='studentBtn';
+        btn.textContent=s.name;
+        btn.onclick=()=>showReport(s);
+        list.appendChild(btn);
     });
-
-    let rank = rankedStudents.findIndex(student => student.upi === upi) + 1;
-    document.getElementById("pos").innerText = rank;
-
-    // Total students in the class
-    document.getElementById("totalStudents").innerText = allStudents.length;
-
-    // Attendance
-    let presentDays = 85;
-    let absentDays = 5;
-    let attendancePercentage = ((presentDays / (presentDays + absentDays)) * 100).toFixed(2);
-    document.getElementById("presentDays").innerText = presentDays;
-    document.getElementById("absentDays").innerText = absentDays;
-    document.getElementById("attendance").innerText = `${attendancePercentage}%`;
+    const pagination=document.getElementById('pagination');
+    pagination.innerHTML='';
+    const totalPages=Math.ceil(filtered.length/itemsPerPage);
+    const prevBtn=document.createElement('button'); prevBtn.textContent='Prev'; prevBtn.disabled=currentPage===1; prevBtn.onclick=()=>{currentPage--; showPage();};
+    const nextBtn=document.createElement('button'); nextBtn.textContent='Next'; nextBtn.disabled=currentPage===totalPages; nextBtn.onclick=()=>{currentPage++; showPage();};
+    pagination.appendChild(prevBtn);
+    pagination.appendChild(nextBtn);
 }
 
-/* HIDE REPORT */
-function hideReport() {
-    document.getElementById("report").style.display = "none";
+function showReport(s){
+    currentStudent=s;
+    document.getElementById('report').style.display='block';
+    document.getElementById('r_school').textContent=s.school;
+    document.getElementById('r_term').textContent=s.term;
+    document.getElementById('r_name').textContent=s.name;
+    document.getElementById('r_upi').textContent=s.upi;
+    document.getElementById('r_cls').textContent=s.cls;
+    document.getElementById('r_gender').textContent=s.gender;
+    const subjects=['k1','k2','k3','k4','k5'];
+    const competences=['c1','c2','c3','c4','c5'];
+    const grades=['g1','g2','g3','g4','g5'];
+    const remarks=['r1','r2','r3','r4','r5'];
+    let total=0;
+    s.marks.forEach((m,i)=>{
+        total+=m;
+        document.getElementById(subjects[i]).textContent=m;
+        let comp=''; let grade=''; let remark='';
+        if(m>=80){comp='Excellent'; grade='A'; remark='Well Done';}
+        else if(m>=60){comp='Good'; grade='B'; remark='Good';}
+        else if(m>=40){comp='Average'; grade='C'; remark='Needs Improvement';}
+        else {comp='Poor'; grade='D'; remark='Fail';}
+        document.getElementById(competences[i]).textContent=comp;
+        document.getElementById(grades[i]).textContent=grade;
+        document.getElementById(remarks[i]).textContent=remark;
+    });
+    document.getElementById('totalMarks').textContent=total;
+    const avg=(total/5).toFixed(2);
+    document.getElementById('avg').textContent=avg;
+    document.getElementById('agg').textContent=avg>=80?'A':avg>=60?'B':avg>=40?'C':'D';
+    document.getElementById('pos').textContent='1';
+    document.getElementById('totalStudents').textContent=filtered.length;
+    document.getElementById('comment').textContent='Keep up the good work!';
+    document.getElementById('presentDays').textContent='80';
+    document.getElementById('absentDays').textContent='5';
+    document.getElementById('attendance').textContent='94%';
 }
 
-/* PRINT REPORT */
-function printReport() {
-    let printContent = document.getElementById("report").outerHTML;
-    let printWindow = window.open('', '', 'height=600,width=800');
-    printWindow.document.write(printContent);
-    printWindow.document.close();
-    printWindow.print();
-}
-
-/* DELETE STUDENT */
-function deleteStudent() {
-    if (currentUPI) {
-        delete db[currentUPI];
-        localStorage.setItem("camis_db", JSON.stringify(db));
-        alert("Student deleted.");
-        location.reload();
-    } else {
-        alert("No student selected.");
+function hideReport(){document.getElementById('report').style.display='none';}
+function printReport(){window.print();}
+function deleteStudent(){
+    if(currentStudent){
+        students=students.filter(s=>s!==currentStudent);
+        filtered=filtered.filter(s=>s!==currentStudent);
+        currentStudent=null;
+        hideReport();
+        showPage();
     }
 }
-
-/* EDIT MARKS */
-function editMarks() {
-    if (!currentUPI || !currentTerm) {
-        alert("No student selected.");
-        return;
+function editMarks(){
+    if(currentStudent){
+        document.getElementById('school').value=currentStudent.school;
+        document.getElementById('cls').value=currentStudent.cls;
+        document.getElementById('name').value=currentStudent.name;
+        document.getElementById('upi').value=currentStudent.upi;
+        document.getElementById('gender').value=currentStudent.gender;
+        document.getElementById('term').value=currentStudent.term;
+        document.getElementById('kiny').value=currentStudent.marks[0];
+        document.getElementById('eng').value=currentStudent.marks[1];
+        document.getElementById('math').value=currentStudent.marks[2];
+        document.getElementById('french').value=currentStudent.marks[3];
+        document.getElementById('sst').value=currentStudent.marks[4];
+        hideReport();
     }
-
-    let newKiny = prompt("Enter new Kinyarwanda mark:");
-    let newEng = prompt("Enter new English mark:");
-    let newMath = prompt("Enter new Math mark:");
-    let newFrench = prompt("Enter new French mark:");
-    let newSST = prompt("Enter new Social Studies mark:");
-
-    let student = db[currentUPI];
-    let termData = student.terms[currentTerm];
-
-    termData.marks.k1 = parseInt(newKiny);
-    termData.marks.k2 = parseInt(newEng);
-    termData.marks.k3 = parseInt(newMath);
-    termData.marks.k4 = parseInt(newFrench);
-    termData.marks.k5 = parseInt(newSST);
-
-    termData.avg = (termData.marks.k1 + termData.marks.k2 + termData.marks.k3 + termData.marks.k4 + termData.marks.k5) / 5;
-
-    localStorage.setItem("camis_db", JSON.stringify(db));
-    alert("Marks updated.");
-    openStudent(currentUPI, currentTerm);  // Refresh the report view
 }
-
 </script>
-
 </body>
-</html> 
+</html>
